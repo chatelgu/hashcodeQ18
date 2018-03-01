@@ -19,6 +19,7 @@ type Ride struct {
 	TimeFinish int
 	Dist int
 	Possible bool
+	StartOnTime bool
 }
 
 func abs (i int) int {
