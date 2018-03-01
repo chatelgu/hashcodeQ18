@@ -5,7 +5,7 @@ import (
 	"logger"
 	"pbm"
 	"fmt"
-	"sub"
+	"algo/dummy"
 )
 
 const TAG = "Main"
@@ -16,7 +16,7 @@ func main() {
 	logger.Level = logger.DEBUG
 
 	args := os.Args[1:]
-	name := "dummy" //
+	name := "a_example" //
 	if (len(args) >= 1) {
 		name = args[0]
 	}
@@ -25,7 +25,8 @@ func main() {
 
 	logger.D(TAG, "%s", p)
 
-	sub := sub.Sub{}
-	sub.ToFile(name)
+	sub :=	dummy.Dummy(p)
+
+	sub.ToFile(name, p)
 }
 

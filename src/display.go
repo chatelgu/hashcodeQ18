@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"logger"
-	"os"
 	"pbm"
 )
 
@@ -13,16 +12,16 @@ func main() {
 	fmt.Printf("Hello\n")
 	logger.Level = logger.DEBUG
 
-	args := os.Args[1:]
-	name := "dummy" //
-	if (len(args) >= 1) {
-		name = args[0]
-	}
+	a := pbm.Parse("a_example")
+	logger.D(TAG2, "%s", a)
 
-	p := pbm.Parse(name)
+	b := pbm.Parse("b_should_be_easy")
+	logger.D(TAG2, "%s", b)
 
-	logger.D(TAG2, "%s", p)
-	for _, r := range p.Rides {
-		logger.D(TAG2, "%s", r)
-	}
+	c := pbm.Parse("c_no_hurry")
+	logger.D(TAG2, "%s", c)
+
+	d := pbm.Parse("d_metropolis")
+	logger.D(TAG2, "%s", d)
+
 }

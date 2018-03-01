@@ -9,6 +9,11 @@ import (
 
 const TAG = "SUB"
 
+func CreateSub(size int) Sub {
+	var s Sub
+	s.Sub = make([][]int, size)
+	return s
+}
 
 type Sub struct {
 	Sub [][]int // list of list of rides id
