@@ -25,7 +25,7 @@ func main() {
 	logger.D(TAG, "%s", p)
 
 	vehicle := pbm.Vehicle{0,0, 0, false}
-	ride := pbm.BuildRide(2,2,4,4)
+	ride := pbm.BuildRide(0, 2,2,4,4)
 	dist := vehicle.DistToRideStart(ride)
 
 	logger.D(TAG, "dist=%d", dist)

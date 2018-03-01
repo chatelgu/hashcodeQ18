@@ -11,6 +11,7 @@ const TAG = "PBM"
 
 
 type Ride struct {
+	Id int
 	RStart int
 	CStart int
 	RFinish int
@@ -78,8 +79,9 @@ type Pbm struct {
 
 // constructors
 
-func BuildRide(RStart, CStart, RFinish, CFinish int) Ride {
+func BuildRide(Id, RStart, CStart, RFinish, CFinish int) Ride {
 	ride := Ride{}
+	ride.Id = Id
 	ride.RStart = RStart
 	ride.CStart = CStart
 	ride.RFinish = RFinish
@@ -87,6 +89,10 @@ func BuildRide(RStart, CStart, RFinish, CFinish int) Ride {
 	ride.Dist = ride.cmpDist()
 	ride.Possible = ride.cmpPossible()
 	return ride
+}
+
+func BuildVehicle(id, C, R int) Vehicle {
+	return Vehicle{id, C, R, false}
 }
 
 func Parse(name string) Pbm {
@@ -104,6 +110,7 @@ func Parse(name string) Pbm {
 	p.Rides = make([]Ride, ride)
 	for i := 0; i<ride; i++ {
 		var r Ride
+		r.Id = i
 		scanner.Scan()
 		fmt.Sscanf(scanner.Text(),"%d %d %d %d %d %d", &r.RStart, &r.CStart, &r.RFinish, &r.CFinish, &r.TimeStart, &r.TimeFinish)
 		r.Dist = r.cmpDist()

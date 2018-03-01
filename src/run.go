@@ -6,10 +6,10 @@ import (
 	"pbm"
 	"fmt"
 	"algo/dummy"
+	"sub"
 )
 
 const TAG = "Main"
-
 
 func main() {
 	fmt.Printf("Hello\n")
@@ -25,8 +25,15 @@ func main() {
 
 	logger.D(TAG, "%s", p)
 
-	sub :=	dummy.Dummy(p)
+	var sub sub.Sub
 
+	logger.D(TAG, "Dummy" )
+	sub = dummy.Dummy(p)
 	sub.ToFile(name, p)
+
+	logger.D(TAG, "Dummy1perV" )
+	sub = dummy.Dummy1perV(p)
+	sub.ToFile(name, p)
+
 }
 
