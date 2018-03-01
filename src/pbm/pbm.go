@@ -29,12 +29,41 @@ func abs (i int) int {
 	return i
 }
 
+func Dist(c1, r1, c2, r2 int ) int {
+	return abs(r1 - r2) + abs(c1 -c2)
+}
 func (r Ride) cmpDist() int {
 	return abs(r.RStart - r.RFinish) + abs(r.CStart -r.CFinish)
 }
 
 func (r Ride) cmpPossible() bool {
 	return r.Dist <= (r.TimeFinish - r.TimeStart)
+}
+
+
+type Vehicle struct {
+	I int // index
+	R int
+	C int
+	OnRide bool
+}
+
+func (v Vehicle) distToRideStart(r Ride) int {
+	return abs(v.R - r.RStart) + abs(v.C -r.CStart)
+}
+
+func (v Vehicle) getClosestFreeRide(rides []Ride) Ride {
+	closestDist := v.distToRideStart(rides[0])
+	closest := rides[0]
+	for i := range rides {
+		ride := rides[i]
+		dist := v.distToRideStart(ride)
+		if dist < closestDist {
+			closest = ride
+			closestDist = dist
+		}
+	}
+	return closest
 }
 
 type Pbm struct {
@@ -48,6 +77,8 @@ type Pbm struct {
 }
 
 // constructors
+
+//func BuildRide()
 
 func Parse(name string) Pbm {
 	var p Pbm
