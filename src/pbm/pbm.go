@@ -29,7 +29,7 @@ func abs (i int) int {
 	return i
 }
 
-func Dist(c1, r1, c2, r2 int ) int {
+func Dist(r1, c1, r2, c2 int ) int {
 	return abs(r1 - r2) + abs(c1 -c2)
 }
 func (r Ride) cmpDist() int {
@@ -48,16 +48,16 @@ type Vehicle struct {
 	OnRide bool
 }
 
-func (v Vehicle) distToRideStart(r Ride) int {
+func (v Vehicle) DistToRideStart(r Ride) int {
 	return abs(v.R - r.RStart) + abs(v.C -r.CStart)
 }
 
-func (v Vehicle) getClosestFreeRide(rides []Ride) Ride {
-	closestDist := v.distToRideStart(rides[0])
+func (v Vehicle) GetClosestFreeRide(rides []Ride) Ride {
+	closestDist := v.DistToRideStart(rides[0])
 	closest := rides[0]
 	for i := range rides {
 		ride := rides[i]
-		dist := v.distToRideStart(ride)
+		dist := v.DistToRideStart(ride)
 		if dist < closestDist {
 			closest = ride
 			closestDist = dist
@@ -78,7 +78,16 @@ type Pbm struct {
 
 // constructors
 
-//func BuildRide()
+func BuildRide(RStart, CStart, RFinish, CFinish int) Ride {
+	ride := Ride{}
+	ride.RStart = RStart
+	ride.CStart = CStart
+	ride.RFinish = RFinish
+	ride.CFinish = CFinish
+	ride.Dist = ride.cmpDist()
+	ride.Possible = ride.cmpPossible()
+	return ride
+}
 
 func Parse(name string) Pbm {
 	var p Pbm
