@@ -3,6 +3,7 @@ package pbm
 import (
 	"fileutil"
 	"fmt"
+	"bufio"
 )
 
 const TAG = "PBM"
@@ -56,11 +57,14 @@ func Parse(name string) Pbm {
 
 	// read data and construct pbm
 	var ride int
-	fmt.Fscanf(reader,"%d %d %d %d %d %d", &p.Row, &p.Column , &p.Fleet, &ride, &p.Bonus, &p.Step)
+	scanner := bufio.NewScanner(reader)
+	scanner.Scan()
+	fmt.Sscanf(scanner.Text(),"%d %d %d %d %d %d", &p.Row, &p.Column , &p.Fleet, &ride, &p.Bonus, &p.Step)
 	p.Rides = make([]Ride, ride)
 	for i := 0; i<ride; i++ {
 		var r Ride
-		fmt.Fscanf(reader,"%d %d %d %d %d %d", &r.RStart, &r.CStart, &r.RFinish, &r.CFinish, &r.TimeStart, &r.TimeFinish)
+		scanner.Scan()
+		fmt.Sscanf(scanner.Text(),"%d %d %d %d %d %d", &r.RStart, &r.CStart, &r.RFinish, &r.CFinish, &r.TimeStart, &r.TimeFinish)
 		r.Dist = r.cmpDist()
 		r.Possible = r.cmpPossible()
 		p.Rides[i] = r

@@ -10,13 +10,13 @@ import (
 
 const TAG = "FILEUTIL"
 
-func OpenPbmFile(name string) io.Reader {
+func OpenPbmFile(name string) *bufio.Reader {
 	filename := fmt.Sprintf("%s.in", name)
 	logger.V(TAG, "Open pbm %s", filename)
 
 	file, err := os.Open(filename)
 	check(err)
-	return file
+	return bufio.NewReader(file)
 }
 
 func CreateSubFile(name string, score int) *bufio.Writer {
