@@ -5,7 +5,13 @@ import (
 	"sub"
 )
 
-func Dummy1perV(p pbm.Pbm) sub.Sub {
+
+type Dummy1perV struct {
+
+}
+
+
+func (Dummy1perV) Solve(p pbm.Pbm) sub.Sub {
 	problem = p
 	s := sub.CreateSub(p.Fleet)
 	//rides := p.Rides

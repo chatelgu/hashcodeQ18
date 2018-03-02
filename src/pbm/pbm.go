@@ -11,7 +11,7 @@ const TAG = "PBM"
 
 
 type Ride struct {
-	Id int
+	Index int
 	RStart int
 	CStart int
 	RFinish int
@@ -35,14 +35,17 @@ func abs (i int) int {
 }
 
 func Dist(r1, c1, r2, c2 int ) int {
-	return abs(r1 - r2) + abs(c1 -c2)
+	return abs(r1 - r2) + abs(c1 - c2)
 }
+
 func (r Ride) cmpDist() int {
 	return abs(r.RStart - r.RFinish) + abs(r.CStart -r.CFinish)
 }
 
 func (r Ride) cmpPossible() bool {
-	return r.Dist <= (r.TimeFinish - r.TimeStart)
+	toGo := Dist(0,0, r.RStart, r.CStart)
+	toDo := Dist(r.RStart , r.CStart, r.RFinish, r.CFinish)
+	return toGo + toDo <= r.TimeFinish
 }
 
 
@@ -85,7 +88,7 @@ type Pbm struct {
 
 func BuildRide(Id, RStart, CStart, RFinish, CFinish int) Ride {
 	ride := Ride{}
-	ride.Id = Id
+	ride.Index = Id
 	ride.RStart = RStart
 	ride.CStart = CStart
 	ride.RFinish = RFinish
@@ -99,6 +102,38 @@ func BuildRide(Id, RStart, CStart, RFinish, CFinish int) Ride {
 func BuildVehicle(id, C, R int) Vehicle {
 	return Vehicle{id, C, R, EmptyRide}
 }
+
+type ByDate []Ride
+
+func (s ByDate) Len() int {
+	return len(s)
+}
+func (s ByDate) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s ByDate) Less(i, j int) bool {
+	r1 := s[i]
+	r2 := s[j]
+
+	return r1.TimeStart < r2.TimeStart
+}
+
+type ByDist []Ride
+
+func (s ByDist) Len() int {
+	return len(s)
+}
+func (s ByDist) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s ByDist) Less(i, j int) bool {
+	r1 := s[i]
+	r2 := s[j]
+
+	return r1.Dist < r2.Dist
+}
+
+
 
 func Parse(name string) Pbm {
 	var p Pbm
@@ -115,7 +150,7 @@ func Parse(name string) Pbm {
 	p.Rides = make([]Ride, ride)
 	for i := 0; i<ride; i++ {
 		var r Ride
-		r.Id = i
+		r.Index = i
 		scanner.Scan()
 		fmt.Sscanf(scanner.Text(),"%d %d %d %d %d %d", &r.RStart, &r.CStart, &r.RFinish, &r.CFinish, &r.TimeStart, &r.TimeFinish)
 		r.Dist = r.cmpDist()
@@ -134,4 +169,15 @@ func (p Pbm) String() string {
 
 func (r Ride) String() string {
 	return fmt.Sprintf("Ride: [%d,%d] to [%d, %d] Start %d Finish %d Dist %d Possible %t", r.RStart, r.CStart, r.RFinish, r.CFinish, r.TimeStart, r.TimeFinish, r.Dist, r.Possible)
+}
+
+func (p Pbm) MaxScore() int {
+	score := 0
+	for _,ride := range p.Rides {
+		score += ride.Dist
+		if (ride.TimeStart >= Dist(0,0, ride.RStart, ride.CStart)) {
+			score += p.Bonus
+		}
+	}
+	return score
 }

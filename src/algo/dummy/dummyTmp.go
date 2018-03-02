@@ -19,12 +19,17 @@ func addRide(rides []pbm.Ride, v pbm.Vehicle, s sub.Sub) {
 	if len(rides)>0 {
 		ride := v.GetClosestFreeRide(rides)
 		v.Ride = ride
-		rides = remove(rides, ride.Id)
-		s.Sub = append(s.Sub, []int{ride.Id})
+		rides = remove(rides, ride.Index)
+		s.Sub = append(s.Sub, []int{ride.Index})
 	}
 }
 
-func DummyTmp(p pbm.Pbm) sub.Sub {
+type DummyTmp struct {
+
+}
+
+
+func (DummyTmp) Solve(p pbm.Pbm) sub.Sub {
 	logger.D(TAG, "DummyTmp")
 	problem = p
 	s := sub.CreateSub(p.Fleet)

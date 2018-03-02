@@ -4,90 +4,114 @@ import (
 	"pbm"
 	"sub"
 	"logger"
+	"sort"
 )
 
+const TAG = "Dummy"
 
-type Vehicule struct {
-	Rides []int
-	Step int
+type vehicule struct {
+	rides []int
+	step int
+	c int
+	r int
 }
 
-func (v *Vehicule) getLastPoint() (int,int) {
-	l := len(v.Rides)
-	if (l == 0) {
-		return 0,0
-	} else {
-		i := v.Rides[l-1]
-		ride := problem.Rides[i]
-		return ride.RFinish, ride.CFinish
-	}
-}
+type run []vehicule
 
-
-func (v *Vehicule) addRide(i int) bool {
-	rf, cf := v.getLastPoint();
-
-	ride := problem.Rides[i]
-	logger.D("Dummy", "%s", ride)
-
-	distToGo := pbm.Dist(rf, cf, ride.RStart, ride.CStart)
-
-	if v.Step + distToGo + ride.Dist > problem.Step {
-		return false
-	} else {
-		v.Step += distToGo + ride.Dist
-		v.Rides = append(v.Rides, i)
-		return true
-	}
-}
-
-type Run struct {
-   l []Vehicule
-}
-
-
-func addRides(run *Run, ride, vehicule int) {
-	logger.D("Dummy", "try ride %d to %d", ride, vehicule)
-
-	if ride == len(problem.Rides) {
-		logger.D("Dummy", "end of it")
-		return
-	}
-	if vehicule == problem.Fleet {
-		logger.D("Dummy", "no more car")
-		ride++
-	} else if run.l[vehicule].addRide(ride) {
-		logger.D("Dummy", "ok assigned")
-		ride++
-	} else {
-		logger.D("Dummy", "next car")
-		vehicule++
-	}
-	logger.D("Dummy", "loop")
-	addRides(run, ride, vehicule)
-}
-
-
-func createRun(size int) Run {
-	var run Run
-	run.l = make([]Vehicule, size)
-	return run
-}
-
-func (run Run) toSub(s *sub.Sub)  {
-	for i,r := range run.l {
-		s.Sub[i] = r.Rides
-	}
-}
-
+var simulation run
 var problem pbm.Pbm
+var sortedRides []pbm.Ride
+
+func createSimultation(size int) {
+	simulation = make([]vehicule, size)
+	for i:=0; i<size; i++ {
+		simulation[i] = vehicule{make([]int, 0), 0, 0 ,0}
+	}
+}
+
+func createSortedRides() {
+	sortedRides = make([]pbm.Ride, len(problem.Rides))
+	for i,ride := range problem.Rides {
+		sortedRides[i] = ride
+	}
+	sort.Sort(pbm.ByDate(sortedRides))
+}
+
+func max(i,j int) int {
+	if i > j {
+		return i
+	} else {
+		return j
+	}
+}
+
+func (v *vehicule) canTakeRide(ride pbm.Ride) (bool, bool, int) {
+	distToGo := pbm.Dist(v.r, v.c, ride.RStart, ride.CStart)
+	dist := ride.Dist
+	bonus := v.step + distToGo <= ride.TimeStart
+	inTime := v.step + distToGo + dist <= ride.TimeFinish
+	newstep := max(v.step + distToGo, ride.TimeStart) + dist
+	return inTime, bonus && inTime, newstep
+}
+
+func (v *vehicule) takeRide(ride pbm.Ride) {
+	ok, _, newstep := v.canTakeRide(ride)
+	if (ok) {
+		v.r = ride.RFinish
+		v.c = ride.CFinish
+		v.step = newstep
+		v.rides = append(v.rides, ride.Index)
+	} else {
+		logger.E(TAG, "Can't take this ride")
+	}
+}
 
 
-func Dummy(p pbm.Pbm) sub.Sub {
+func findVehicule(ride pbm.Ride) (bool, vehicule, int) {
+	best_vehicule_index := -1
+	for i,v := range simulation {
+		//logger.D(TAG, "vehicule %d", i)
+		ok, bonus, _ := v.canTakeRide(ride)
+		//logger.D(TAG, "can take %t %t", ok, bonus)
+		if (bonus) {
+			return true, v , i
+		} else if ok {
+			best_vehicule_index = i
+		}
+	}
+	if (best_vehicule_index == -1) {
+		return false, vehicule{}, -1
+	} else {
+		return true, simulation[best_vehicule_index], best_vehicule_index
+	}
+}
+
+
+type Dummy struct {
+
+}
+
+func (Dummy) Solve(p pbm.Pbm) sub.Sub {
 	problem = p
 	s := sub.CreateSub(p.Fleet)
-	run := createRun(p.Fleet)
-	addRides(&run, 0,0)
-	run.toSub(&s)
+	createSimultation(p.Fleet)
+	createSortedRides()
+
+	for i,ride := range sortedRides {
+		logger.V(TAG, "ride %d : %s", i, ride)
+		ok, v, i := findVehicule(ride)
+		if ok {
+			logger.V(TAG, "ride taken by v")
+			v.takeRide(ride)
+			logger.V(TAG, "rides", v.rides)
+			simulation[i] = v
+		}
+	}
+
+	for i,v := range simulation {
+		s.Sub[i] = v.rides
+		logger.V(TAG, "rides ", v.rides)
+	}
+
 	return s
 }
