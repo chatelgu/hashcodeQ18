@@ -21,7 +21,11 @@ type Ride struct {
 	Dist int
 	Possible bool
 	StartOnTime bool
+	Step int
 }
+
+
+var EmptyRide Ride
 
 func abs (i int) int {
 	if i<0 {
@@ -46,7 +50,7 @@ type Vehicle struct {
 	I int // index
 	R int
 	C int
-	OnRide bool
+	Ride Ride
 }
 
 func (v Vehicle) DistToRideStart(r Ride) int {
@@ -88,11 +92,12 @@ func BuildRide(Id, RStart, CStart, RFinish, CFinish int) Ride {
 	ride.CFinish = CFinish
 	ride.Dist = ride.cmpDist()
 	ride.Possible = ride.cmpPossible()
+	ride.Step = 0
 	return ride
 }
 
 func BuildVehicle(id, C, R int) Vehicle {
-	return Vehicle{id, C, R, false}
+	return Vehicle{id, C, R, EmptyRide}
 }
 
 func Parse(name string) Pbm {

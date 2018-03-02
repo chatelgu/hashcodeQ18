@@ -35,5 +35,8 @@ func main() {
 	sub = dummy.Dummy1perV(p)
 	sub.ToFile(name, p)
 
+//	logger.D(TAG, "DummyTmp" )
+//	sub = dummy.DummyTmp(p)
+//	sub.ToFile(name, p)
 }
 
