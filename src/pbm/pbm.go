@@ -103,35 +103,6 @@ func BuildVehicle(id, C, R int) Vehicle {
 	return Vehicle{id, C, R, EmptyRide}
 }
 
-type ByDate []Ride
-
-func (s ByDate) Len() int {
-	return len(s)
-}
-func (s ByDate) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s ByDate) Less(i, j int) bool {
-	r1 := s[i]
-	r2 := s[j]
-
-	return r1.TimeStart < r2.TimeStart
-}
-
-type ByDist []Ride
-
-func (s ByDist) Len() int {
-	return len(s)
-}
-func (s ByDist) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-func (s ByDist) Less(i, j int) bool {
-	r1 := s[i]
-	r2 := s[j]
-
-	return r1.Dist < r2.Dist
-}
 
 
 
